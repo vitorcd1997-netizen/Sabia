@@ -1,17 +1,8 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBOWxNlK0RiGCfcdOrzC2MrW4xTpbm1zZ0",
-  authDomain: "sabia-ddd29.firebaseapp.com",
-  projectId: "sabia-ddd29",
-  storageBucket: "sabia-ddd29.firebasestorage.app",
-  messagingSenderId: "1051167319008",
-  appId: "1:1051167319008:web:a62b428c5d43f9ac910185"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+{
+  "apiKey": "AIzaSyBOWxNlK0RiGCfcdOrzC2MrW4xTpbm1zZ0",
+  "authDomain": "sabia-ddd29.firebaseapp.com",
+  "projectId": "sabia-ddd29",
+  "storageBucket": "sabia-ddd29.firebasestorage.app",
+  "messagingSenderId": "1051167319008",
+  "appId": "1:1051167319008:web:a62b428c5d43f9ac910185"
+}
