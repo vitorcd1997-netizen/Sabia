@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@layer base {
+  dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+  }
+  
+  dialog[open] {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.modal {
+  border: none;
+  background: white;
+}

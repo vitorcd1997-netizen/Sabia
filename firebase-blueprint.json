@@ -1,0 +1,115 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile and Configuration",
+      "description": "User account information, subscription plan, and business settings.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "plan": { "type": "string", "enum": ["none", "basic", "pro"] },
+        "aiEnabled": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "businessName": { "type": "string" },
+        "assistantName": { "type": "string" },
+        "workingDays": { "type": "array", "items": { "type": "number" } },
+        "workingHours": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "string" },
+            "end": { "type": "string" }
+          }
+        },
+        "pauses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "start": { "type": "string" },
+              "end": { "type": "string" }
+            }
+          }
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "duration": { "type": "number" },
+              "interval": { "type": "number" }
+            }
+          }
+        },
+        "blockedDates": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["uid", "name", "email", "plan", "aiEnabled", "createdAt", "businessName", "services"]
+    },
+    "Client": {
+      "title": "Client",
+      "description": "Customer information.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "cpf": { "type": "string" },
+        "notes": { "type": "string" },
+        "ownerId": { "type": "string" }
+      },
+      "required": ["name", "phone", "ownerId"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Scheduled service for a client.",
+      "type": "object",
+      "properties": {
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "clientPhone": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "serviceName": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "status": { "type": "string", "enum": ["confirmed", "cancelled"] }
+      },
+      "required": ["clientId", "serviceId", "date", "startTime", "endTime", "ownerId"]
+    },
+    "PublicAppointment": {
+      "title": "Public Appointment",
+      "description": "Non-PII appointment data for availability checking.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" }
+      },
+      "required": ["ownerId", "date", "startTime", "endTime"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User specific settings and business configuration."
+    },
+    "/clients/{clientId}": {
+      "schema": "Client",
+      "description": "Clients managed by the user."
+    },
+    "/appointments/{appointmentId}": {
+      "schema": "Appointment",
+      "description": "Appointments managed by the user."
+    },
+    "/public_appointments/{appointmentId}": {
+      "schema": "PublicAppointment",
+      "description": "Publicly visible slots to prevent overlaps."
+    }
+  }
+}

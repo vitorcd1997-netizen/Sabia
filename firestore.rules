@@ -1,0 +1,95 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Fields: businessName, assistantName, workingDays, workingHours, breakHours, services, ownerId
+    //
+    // Collection: clients
+    // Fields: name, phone, email, cpf, notes, ownerId
+    //
+    // Collection: appointments
+    // Fields: clientId, clientName, clientPhone, serviceId, serviceName, date, startTime, endTime, ownerId, status
+    //
+    // Collection: public_appointments
+    // Fields: ownerId, date, startTime, endTime
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.ownerId;
+    }
+
+    function isRequestOwner() {
+      return isAuthenticated() && request.auth.uid == request.resource.data.ownerId;
+    }
+
+    function isValidUser(data) {
+      return data.businessName is string && data.businessName.size() > 0 &&
+             data.plan in ['none', 'basic', 'pro'] &&
+             data.uid is string &&
+             data.email is string;
+    }
+
+    function isValidClient(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.phone is string && data.phone.size() > 0 && data.phone.size() < 20 &&
+             data.ownerId is string;
+    }
+
+    function isValidAppointment(data) {
+      return data.clientId is string && data.serviceId is string &&
+             data.date is string && data.startTime is string && data.endTime is string &&
+             data.ownerId is string;
+    }
+
+    function isValidPublicAppointment(data) {
+      return data.ownerId is string && data.date is string &&
+             data.startTime is string && data.endTime is string;
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if true; // Publicly readable for booking
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if isOwner(userId);
+    }
+
+    match /clients/{clientId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner() && isValidClient(request.resource.data);
+      allow update: if isDocOwner() && isRequestOwner() && isValidClient(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    match /appointments/{appointmentId} {
+      allow read: if isDocOwner();
+      allow create: if (isRequestOwner() || !isAuthenticated()) && isValidAppointment(request.resource.data);
+      allow update: if isDocOwner() && isRequestOwner() && isValidAppointment(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    match /public_appointments/{appointmentId} {
+      allow read: if true; // Publicly readable to check availability
+      allow create: if (isRequestOwner() || !isAuthenticated()) && isValidPublicAppointment(request.resource.data);
+      allow update: if isDocOwner() && isRequestOwner() && isValidPublicAppointment(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}
